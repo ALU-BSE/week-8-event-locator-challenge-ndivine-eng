@@ -5,111 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Locator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">Event Locator</a>
+            <a class="navbar-brand fw-bold" href="index.html">Event Locator</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="events.html">Browse Events</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <!-- Search Section -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Find Events in Kigali City</h2>
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="row g-2">
-                    <div class="col-md-5">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa fa-search"></i></span>
-                            <input type="text" id="search" class="form-control" placeholder="Search events..." aria-label="Search events">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" id="dateFilter" class="form-control" aria-label="Filter by date">
-                    </div>
-                    <div class="col-md-3">
-                        <select id="categoryFilter" class="form-select" aria-label="Filter by category">
-                            <option value="">All Categories</option>
-                            <option value="Music">Music</option>
-                            <option value="Sports">Sports</option>
-                            <option value="Tech">Tech</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+    <!-- Hero Section -->
+    <header class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1 class="fw-bold">Discover Events Near You</h1>
+            <p class="lead">Find, explore, and join amazing events happening around you.</p>
         </div>
+    </header>
 
-        <!-- Event List -->
-        <div class="mt-5">
-            <h3 class="text-center">Upcoming Events</h3>
-            <div id="eventList" class="row mt-3">
-                <!-- Events will be displayed here dynamically -->
+    <!-- Search and Filter Section -->
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search events...">
+                    <select id="category-filter" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="Music">Music</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Tech">Tech</option>
+                        <option value="Education">Education</option>
+                    </select>
+                    <input type="date" id="date-filter" class="form-control">
+                    <button class="btn btn-primary" id="search-btn">Search</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Sample event data
-        const events = [
-            { name: "Tech Conference", date: "2025-03-15", category: "Tech", location: "Kigali Convention Center" },
-            { name: "Music Festival", date: "2025-03-20", category: "Music", location: "Amahoro Stadium" },
-            { name: "Football Match", date: "2025-03-25", category: "Sports", location: "Kigali Arena" }
-        ];
+    <!-- Events Preview Section -->
+    <div class="container mt-5">
+        <h2 class="text-center">Upcoming Events</h2>
+        <div id="event-preview" class="row mt-3"></div>
+        <div class="text-center mt-3">
+            <a href="events.html" class="btn btn-secondary">View All Events</a>
+        </div>
+    </div>
 
-        // Function to display events
-        function displayEvents(filteredEvents) {
-            const eventList = document.getElementById("eventList");
-            eventList.innerHTML = "";
-            if (filteredEvents.length === 0) {
-                eventList.innerHTML = `<p class="text-center text-muted">No events found.</p>`;
-                return;
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="js/events.js"></script>
+    <script>
+        document.getElementById("search-btn").addEventListener("click", function () {
+            const searchQuery = document.getElementById("search-input").value.toLowerCase();
+            const selectedCategory = document.getElementById("category-filter").value;
+            const selectedDate = document.getElementById("date-filter").value;
+
+            let filteredEvents = events;
+
+            if (searchQuery) {
+                filteredEvents = filteredEvents.filter(event => event.name.toLowerCase().includes(searchQuery));
             }
-            filteredEvents.forEach(event => {
-                eventList.innerHTML += `
+            if (selectedCategory) {
+                filteredEvents = filteredEvents.filter(event => event.category === selectedCategory);
+            }
+            if (selectedDate) {
+                filteredEvents = filteredEvents.filter(event => event.date === selectedDate);
+            }
+
+            localStorage.setItem("filteredEvents", JSON.stringify(filteredEvents));
+            window.location.href = "events.html";
+        });
+
+        // Load a few events for preview
+        function loadPreviewEvents() {
+            const previewContainer = document.getElementById("event-preview");
+            previewContainer.innerHTML = "";
+
+            const previewEvents = events.slice(0, 3); // Show only first 3 events
+            previewEvents.forEach(event => {
+                const eventCard = `
                     <div class="col-md-4">
-                        <div class="card mb-3 shadow-sm">
+                        <div class="card shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title">${event.name}</h5>
                                 <p class="card-text"><strong>Date:</strong> ${event.date}</p>
-                                <p class="card-text"><strong>Category:</strong> ${event.category}</p>
                                 <p class="card-text"><strong>Location:</strong> ${event.location}</p>
+                                <a href="event-details.html?id=${event.id}" class="btn btn-primary">View Details</a>
                             </div>
                         </div>
                     </div>
                 `;
+                previewContainer.innerHTML += eventCard;
             });
         }
 
-        // Filter events based on user input
-        function filterEvents() {
-            const searchText = document.getElementById("search").value.toLowerCase();
-            const selectedDate = document.getElementById("dateFilter").value;
-            const selectedCategory = document.getElementById("categoryFilter").value;
-
-            const filtered = events.filter(event => {
-                return (
-                    (event.name.toLowerCase().includes(searchText) || event.location.toLowerCase().includes(searchText)) &&
-                    (selectedDate === "" || event.date === selectedDate) &&
-                    (selectedCategory === "" || event.category === selectedCategory)
-                );
-            });
-
-            displayEvents(filtered);
-        }
-
-        // Event listeners for search inputs
-        document.getElementById("search").addEventListener("input", filterEvents);
-        document.getElementById("dateFilter").addEventListener("change", filterEvents);
-        document.getElementById("categoryFilter").addEventListener("change", filterEvents);
-
-        // Display all events by default
-        displayEvents(events);
+        document.addEventListener("DOMContentLoaded", loadPreviewEvents);
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
